@@ -7,7 +7,7 @@ After=network.target
 ExecStart=/usr/bin/node /var/www/decap-oauth/oauth-server.mjs
 Environment=GITHUB_CLIENT_ID=ضع_هنا
 Environment=GITHUB_CLIENT_SECRET=ضع_هنا
-Environment=PORT=3005
+Environment=PORT=3055
 Restart=always
 User=www-data
 

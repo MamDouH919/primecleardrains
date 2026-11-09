@@ -3,7 +3,7 @@ locale: ar
 
 backend:
   name: github
-  repo: OWNER/drain-kuwait # غيّرها لاسم الريبو على GitHub
+  repo: MamDouH919/primecleardrains
   branch: main
   base_url: https://primecleardrains.novaslash.com # غيّرها لدومينك
   auth_endpoint: api/auth

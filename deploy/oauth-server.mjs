@@ -1,10 +1,10 @@
 // سيرفر صغير لتسجيل الدخول بـ GitHub في لوحة Decap CMS (بدون أي dependencies).
 // شغّله على الـ VPS: node deploy/oauth-server.mjs
-// المتغيرات المطلوبة: GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET, PORT (اختياري، الافتراضي 3005)
+// المتغيرات المطلوبة: GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET, PORT (اختياري، الافتراضي 3055)
 import { createServer } from 'node:http';
 import { randomBytes } from 'node:crypto';
 
-const { GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET, PORT = 3005 } = process.env;
+const { GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET, PORT = 3055 } = process.env;
 if (!GITHUB_CLIENT_ID || !GITHUB_CLIENT_SECRET) {
 	console.error('GITHUB_CLIENT_ID and GITHUB_CLIENT_SECRET are required');
 	process.exit(1);
