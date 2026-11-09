@@ -1,63 +1,239 @@
 ---
-import AboutHeroImage from '../assets/blog-placeholder-about.jpg';
+import type { ImageMetadata } from 'astro';
+import { Image } from 'astro:assets';
+import AboutHeroImage from '../assets/about-us.webp';
 import Layout from '../layouts/BlogPost.astro';
+import { PHONE } from '../consts';
+import Features from '../assets/about/features-section-background-company-vehicle-or-team-at-a-worksite.webp';
+import Equipment from '../assets/about/high-pressure-drain-cleaning-machine-equipment.webp';
+import Technician from '../assets/about/kitchen-or-bathroom-drain-cleaning-technician.webp';
+import Team from '../assets/about/team-members-in-uniform.webp';
+
+// ============================================================
+// أماكن الصور (4 صور) — المقاس المطلوب لكل صورة: 1200 × 675 بكسل (16:9) بصيغة webp
+// عشان تضيف صورة: حطها في src/assets/about/ واعمل import ليها وحطها مكان null
+// مثال:
+//   import Technician from '../assets/about/technician.webp';
+//   technician: Technician,
+// ============================================================
+const images: Record<string, ImageMetadata | null> = {
+	technician: Technician, // صورة 1: فني بيسلك مجاري مطبخ أو حمام
+	features: Features, // صورة 2: خلفية قسم المميزات (عربية الشركة أو الفريق في موقع عمل)
+	equipment: Equipment, // صورة 4: ماكينة تسليك بالضغط العالي / المعدات
+	team: Team, // صورة 3: فريق العمل بالزي الموحد
+};
+
+const alts = {
+	technician: 'فني السلسبيل للتسليك أثناء تسليك مجاري مطبخ في الكويت',
+	features: 'فريق السلسبيل للتسليك في موقع عمل لتسليك المجاري في الكويت',
+	equipment: 'ماكينة تسليك مجاري بالضغط العالي من السلسبيل للتسليك',
+	team: 'فريق فنيين السلسبيل للتسليك المتخصصين في تسليك المجاري',
+};
+
+const title = 'شركة تسليك مجاري في الكويت | السلسبيل للتسليك';
+const description =
+	'السلسبيل للتسليك أفضل شركة تسليك مجاري في الكويت 24 ساعة: تسليك مجاري المطبخ والحمام والبواليع بالضغط العالي وتفتيت الدهون والرواسب بفنيين متخصصين وأسعار مناسبة.';
+
+const pageUrl = new URL(Astro.url.pathname, Astro.site).href;
+const siteUrl = new URL('/', Astro.site).href;
+const schema = {
+	'@context': 'https://schema.org',
+	'@graph': [
+		{
+			'@type': 'AboutPage',
+			'@id': `${pageUrl}#webpage`,
+			url: pageUrl,
+			name: title,
+			description,
+			inLanguage: 'ar',
+			isPartOf: { '@id': `${siteUrl}#website` },
+			about: { '@id': `${siteUrl}#business` },
+		},
+		{
+			'@type': 'BreadcrumbList',
+			itemListElement: [
+				{ '@type': 'ListItem', position: 1, name: 'الرئيسية', item: siteUrl },
+				{ '@type': 'ListItem', position: 2, name: 'من نحن', item: pageUrl },
+			],
+		},
+	],
+};
 ---
 
 <Layout
-	title="About Me"
-	description="Lorem ipsum dolor sit amet"
+	title={title}
+	description={description}
 	pubDate={new Date('August 08 2021')}
 	heroImage={AboutHeroImage}
 >
-	<p>
-		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut
-		labore et dolore magna aliqua. Vitae ultricies leo integer malesuada nunc vel risus commodo
-		viverra. Adipiscing enim eu turpis egestas pretium. Euismod elementum nisi quis eleifend quam
-		adipiscing. In hac habitasse platea dictumst vestibulum. Sagittis purus sit amet volutpat. Netus
-		et malesuada fames ac turpis egestas. Eget magna fermentum iaculis eu non diam phasellus
-		vestibulum lorem. Varius sit amet mattis vulputate enim. Habitasse platea dictumst quisque
-		sagittis. Integer quis auctor elit sed vulputate mi. Dictumst quisque sagittis purus sit amet.
-	</p>
+	<script type="application/ld+json" set:html={JSON.stringify(schema)} />
 
 	<p>
-		Morbi tristique senectus et netus. Id semper risus in hendrerit gravida rutrum quisque non
-		tellus. Habitasse platea dictumst quisque sagittis purus sit amet. Tellus molestie nunc non
-		blandit massa. Cursus vitae congue mauris rhoncus. Accumsan tortor posuere ac ut. Fringilla urna
-		porttitor rhoncus dolor. Elit ullamcorper dignissim cras tincidunt lobortis. In cursus turpis
-		massa tincidunt dui ut ornare lectus. Integer feugiat scelerisque varius morbi enim nunc.
-		Bibendum neque egestas congue quisque egestas diam. Cras ornare arcu dui vivamus arcu felis
-		bibendum. Dignissim suspendisse in est ante in nibh mauris. Sed tempus urna et pharetra pharetra
-		massa massa ultricies mi.
+		<strong>السلسبيل للتسليك</strong> أفضل <strong>شركة تسليك مجاري في الكويت</strong>، حيث إنها
+		تستخدم أفضل الأدوات والمعدات التي يتم الاعتماد عليها، وذلك في مجال التسليك وتنظيف الصرف الصحي
+		مع التخلص التام من جميع مشاكل الانسدادات الموجودة، حيث إنها تعتمد على فنيين متخصصين في هذا
+		المجال والقادرين على تقديم الخدمات المثالية على أكمل وجه ممكن.
+	</p>
+	<p>
+		كما تقوم بتفتيت جميع أنواع الدهون والرواسب المتراكمة، بالاعتماد على الأدوات الحديثة والفنيين
+		المتخصصين في هذا المجال، الذين يمتلكون خبرة في مجال تسليك المجاري، ومن خلال مقالنا هذا يمكن
+		الحصول على المزيد من المعلومات والتفاصيل الأخرى.
 	</p>
 
+	<h2>تسليك مجاري في الكويت</h2>
 	<p>
-		Mollis nunc sed id semper risus in. Convallis a cras semper auctor neque. Diam sit amet nisl
-		suscipit. Lacus viverra vitae congue eu consequat ac felis donec. Egestas integer eget aliquet
-		nibh praesent tristique magna sit amet. Eget magna fermentum iaculis eu non diam. In vitae
-		turpis massa sed elementum. Tristique et egestas quis ipsum suspendisse ultrices. Eget lorem
-		dolor sed viverra ipsum. Vel turpis nunc eget lorem dolor sed viverra. Posuere ac ut consequat
-		semper viverra nam. Laoreet suspendisse interdum consectetur libero id faucibus. Diam phasellus
-		vestibulum lorem sed risus ultricies tristique. Rhoncus dolor purus non enim praesent elementum
-		facilisis. Ultrices tincidunt arcu non sodales neque. Tempus egestas sed sed risus pretium quam
-		vulputate. Viverra suspendisse potenti nullam ac tortor vitae purus faucibus ornare. Fringilla
-		urna porttitor rhoncus dolor purus non. Amet dictum sit amet justo donec enim.
+		إننا نوفر لكم في السلسبيل للتسليك خدمة <strong>تسليك مجاري في الكويت</strong> على يد فني صحي
+		بالكويت، والذي يعمل على تسليك المجاري بالاعتماد على أحدث التقنيات والمواد المخصصة لأعمال تسليك
+		المجاري، وذلك حتى يتمكن من حل جميع المشاكل الصعبة فيما يتعلق بمجاله.
+	</p>
+	<p>
+		حيث إنه يعتبر الأفضل من ناحية الجودة والكفاءة والخبرة، لكونه يتمكن من التحليل والفهم المتخصص في
+		تنفيذ جميع أعمال <strong>تسليك البواليع</strong> و<strong>تسليك مجاري المطبخ</strong>، بالإضافة
+		إلى <strong>تسليك مجاري الحمام</strong> والتخلص من كافة الأوساخ العالقة في تلك المواسير أو
+		التراكمات الدهنية الموجودة فيها.
 	</p>
 
+	<figure class="img-slot">
+		{images.technician
+			? <Image src={images.technician} alt={alts.technician} width={1200} height={675} loading="lazy" />
+			: <div class="placeholder">صورة 1 — 1200 × 675</div>}
+	</figure>
+
+	<h2>مميزات السلسبيل للتسليك</h2>
 	<p>
-		Mattis ullamcorper velit sed ullamcorper morbi tincidunt. Tortor posuere ac ut consequat semper
-		viverra. Tellus mauris a diam maecenas sed enim ut sem viverra. Venenatis urna cursus eget nunc
-		scelerisque viverra mauris in. Arcu ac tortor dignissim convallis aenean et tortor at. Curabitur
-		gravida arcu ac tortor dignissim convallis aenean et tortor. Egestas tellus rutrum tellus
-		pellentesque eu. Fusce ut placerat orci nulla pellentesque dignissim enim sit amet. Ut enim
-		blandit volutpat maecenas volutpat blandit aliquam etiam. Id donec ultrices tincidunt arcu. Id
-		cursus metus aliquam eleifend mi.
+		تتسم السلسبيل للتسليك بأنها تقدم الكثير من الخدمات المختلفة التي يرغب بها العملاء، كما أنها
+		تتيح لهم كافة سبل الراحة وتضمن رضاهم التام عن مستوى الخدمات المقدمة، وفيما يلي يمكن توضيح ذلك:
 	</p>
 
+	<figure class="img-slot">
+		{images.features
+			? <Image src={images.features} alt={alts.features} width={1200} height={675} loading="lazy" />
+			: <div class="placeholder">صورة 2 — 1200 × 675</div>}
+	</figure>
+
+	<h3>مواعيد العمل على مدار 24 ساعة</h3>
 	<p>
-		Tempus quam pellentesque nec nam aliquam sem. Risus at ultrices mi tempus imperdiet. Id porta
-		nibh venenatis cras sed felis eget velit. Ipsum a arcu cursus vitae. Facilisis magna etiam
-		tempor orci eu lobortis elementum. Tincidunt dui ut ornare lectus sit. Quisque non tellus orci
-		ac. Blandit libero volutpat sed cras. Nec tincidunt praesent semper feugiat nibh sed pulvinar
-		proin gravida. Egestas integer eget aliquet nibh praesent tristique magna.
+		عند التواصل مع السلسبيل للتسليك، يمكنك أن ترتب موعدًا معنا حتى تحصل على خدمات تسليك مجاري في
+		الكويت، حيث إن الشركة تعمل على مدار اليوم 24 ساعة وتوفر الخدمات المناسبة على أكمل وجه ممكن، مع
+		الحرص الدائم على سرعة تلبية طلبات العملاء فور التواصل معنا على الأرقام المخصصة لذلك، حتى نتمكن من
+		إنهاء مشكلة انسدادات المجاري.
+	</p>
+	<p>
+		بالإضافة إلى ذلك نقدم كافة خدمات تسليك الضغط الضرورية، التي تضمن في النهاية الحفاظ على نظام
+		سباكة صحي عندما يتعلق الأمر بفك انسداد المصارف والأنابيب، فالتعاقد مع شركتنا المتخصصة في هذا
+		المجال هو الاختيار الأمثل، لأننا نعرف أن خدمات التسليك أمر بالغ الأهمية، ولذلك نستعمل معدات
+		وتقنيات متطورة لمعالجة حتى أكثر العوائق التصاقًا في المكان.
+	</p>
+
+	<h3>خبرة العمل</h3>
+	<p>
+		تمتلك الشركة فريق عمل متميزًا في هذا المجال من الخبراء الذين لديهم الدراية التامة والاحترافية،
+		كما أنها تمتلك الخبرة الكافية للتعرف على شبكات الصرف وسرعة التعامل مع المشكلة، ولا تغادر المكان
+		إلا بعد التحقق من أن العميل راضٍ بالكامل عن مستوى الخدمات المقدمة إليه.
+	</p>
+	<p>
+		بالإضافة إلى أنها تقدم خدمات <strong>تسليك المجاري بالضغط العالي</strong>، وذلك من خلال استخدام
+		آلات قوية تولد ضغط ماء لطرد الحطام والشحوم وجميع مواد الانسداد الأخرى من نظام الصرف، وهذه
+		الطريقة فعالة للغاية وتضمن إزالة العوائق والرواسب التي يمكن أن تتراكم مع مرور الوقت وتسبب
+		انسدادًا شديدًا.
+	</p>
+
+	<h3>فريق العمل</h3>
+	<p>
+		تقدم الشركة طاقمًا من الفنيين المدربين على أعلى مستوى، وذلك حتى يتمكنوا من علاج كافة المشاكل أو
+		الانسدادات خلال أسرع وقت ممكن، حيث إنها تمتلك أفضل فريق متخصص في هذا المجال منذ سنوات طويلة،
+		ولذلك هم قادرون على زيارة منزل العميل وتقديم خدمات مناسبة لمنع تسربات المجاري في المكان.
+	</p>
+	<p>
+		بالإضافة إلى أن الفريق قادر على تطبيق جميع خدمات الضغط العالي، التي تتميز بقدرتها على تسليك
+		الأنابيب والتخلص من كافة مشاكل تراكم الأوساخ والبكتيريا، وبالتالي المساعدة على تحسين النظافة
+		العامة ومنع الانسدادات في المستقبل.
+	</p>
+
+	<figure class="img-slot">
+		{images.team
+			? <Image src={images.team} alt={alts.team} width={1200} height={675} loading="lazy" />
+			: <div class="placeholder">صورة 3 — 1200 × 675</div>}
+	</figure>
+
+	<h3>الأدوات المتطورة</h3>
+	<p>
+		تمتلك الشركة عددًا كبيرًا من الوسائل والأساليب المتطورة، وهي أدوات مستوردة من الخارج تساهم في
+		تسليك شبكات الصرف مع ضمان إنهاء مشاكل الانسداد بصورة تامة، بالإضافة إلى ذلك تتبع الشركة أكثر من
+		طريقة لحل كافة عقبات انسداد المجاري، وحتى تسليك شبكات الصرف الصحي بما يناسب طبيعة المكان.
+	</p>
+	<p>
+		مع ضمان نظام سباكة فعال وطويل الأمد بفضل تلك الآلات والأدوات، لأنها توفر خدمات تسليك المجاري
+		بالضغط العالي لإزالة انسداد المصارف والحفاظ على نظام سباكة صحي، كما تستخدم تقنيات ومعدات متقدمة
+		للتخلص من العوائق وتسليك الأنابيب بشكل فعال، بالإضافة إلى ضمان تدفق المياه بشكل صحيح ومنع مشاكل
+		السباكة في المستقبل.
+	</p>
+
+	<figure class="img-slot">
+		{images.equipment
+			? <Image src={images.equipment} alt={alts.equipment} width={1200} height={675} loading="lazy" />
+			: <div class="placeholder">صورة 4 — 1200 × 675</div>}
+	</figure>
+
+	<h3>خدمة العملاء</h3>
+	<p>
+		يوجد في السلسبيل للتسليك فريق متكامل من العاملين لخدمة العملاء والرد على جميع استفساراتهم طوال
+		الوقت على مدار 24 ساعة، مع تنويع الخدمات المقدمة للأفراد، حيث نقوم بتسليك مجاري الحمامات
+		والمطاعم والمنازل، بالإضافة إلى المجاري الخارجية، بعد ترتيب مواعيد مسبقة فور التواصل على الأرقام
+		المخصصة لذلك.
+	</p>
+	<p>
+		كما يمكن فور التواصل معنا ترتيب موعد مسبق للحصول على خدمات تطهير الصرف الصحي، ومنع الانسدادات
+		المستقبلية، مع ضمان المحافظة على التدفق المناسب لمياه الصرف الصحي بالاعتماد على الآلات
+		المتخصصة.
+	</p>
+
+	<h3>الأسعار المناسبة</h3>
+	<p>
+		من أفضل ما يميز شركتنا أنها توفر للعملاء أفضل الخدمات الممكنة مقابل أسعار تنافسية مناسبة للجميع،
+		حيث تتيح الشركة خدماتها بأسعار منخفضة مع الكثير من التخفيضات والخصومات من فترة لأخرى، بالإضافة
+		إلى ذلك تتيح خدمات تسليك المجاري في كافة الأوقات، ولديها أسطول كبير من السيارات يمكنه الانتقال إلى
+		جميع مناطق الكويت.
+	</p>
+	<p>
+		وتقوم الشركة بتدريب المهنيين على التعامل مع مختلف الأدوات والمواد المستخدمة، بما يضمن التسليك
+		الفعال والآمن من دون التسبب في أي ضرر، مع تطبيق أفضل نظام سباكة بشكل عام من خلال اختيار خدمات
+		موثوقة في إزالة الانسداد.
+	</p>
+
+	<p class="cta">
+		للحصول على خدمة تسليك مجاري في الكويت الآن، اتصل بـ<strong>السلسبيل للتسليك</strong> على
+		<a href={`tel:${PHONE}`} dir="ltr">{PHONE}</a> أو تصفح <a href="/projects/">أعمالنا السابقة</a>.
 	</p>
 </Layout>
+
+<style>
+	.img-slot {
+		margin: 0 0 2em;
+	}
+	.img-slot :global(img) {
+		display: block;
+		width: 100%;
+		height: auto;
+		aspect-ratio: 16 / 9;
+		object-fit: cover;
+		border-radius: 12px;
+	}
+	.placeholder {
+		display: grid;
+		place-items: center;
+		aspect-ratio: 16 / 9;
+		border: 2px dashed rgb(var(--gray));
+		border-radius: 12px;
+		color: rgb(var(--gray));
+		font-weight: 700;
+	}
+	h3 {
+		margin-top: 1.5em;
+	}
+	.cta {
+		padding: 1em;
+		border-radius: 12px;
+		background: rgba(var(--gray-light), 0.5);
+	}
+</style>

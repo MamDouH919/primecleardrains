@@ -1,0 +1,171 @@
+---
+import BaseHead from '../../components/BaseHead.astro';
+import FloatingContact from '../../components/FloatingContact.astro';
+import Footer from '../../components/Footer.astro';
+import Header from '../../components/Header.astro';
+import ProjectCard from '../../components/projects/ProjectCard.astro';
+import JsonLd from '../../components/projects/JsonLd.astro';
+import { filled, t } from '../../i18n/ar';
+import { getProjects, projectUrl } from '../../lib/projects';
+import '../../styles/home.css';
+
+const projects = await getProjects();
+const services = [...new Set(projects.map((p) => p.data.service))];
+
+const pageUrl = new URL('/projects/', Astro.site).href;
+const schema = [
+	{
+		'@type': 'CollectionPage',
+		'@id': pageUrl,
+		url: pageUrl,
+		name: filled('projects.page.h1'),
+		description: filled('projects.page.description'),
+		inLanguage: 'ar',
+		isPartOf: { '@id': new URL('/#website', Astro.site).href },
+		mainEntity: {
+			'@type': 'ItemList',
+			itemListElement: projects.map((project, i) => ({
+				'@type': 'ListItem',
+				position: i + 1,
+				url: new URL(projectUrl(project), Astro.site).href,
+				name: project.data.title,
+			})),
+		},
+	},
+	{
+		'@type': 'BreadcrumbList',
+		itemListElement: [
+			{ '@type': 'ListItem', position: 1, name: filled('nav.home'), item: new URL('/', Astro.site).href },
+			{ '@type': 'ListItem', position: 2, name: filled('projects.page.h1'), item: pageUrl },
+		],
+	},
+];
+---
+
+<!doctype html>
+<html lang="ar" dir="rtl">
+	<head>
+		<BaseHead
+			title={t('projects.page.title')}
+			description={t('projects.page.description')}
+			image={projects[0]?.data.cover}
+		/>
+		<JsonLd graph={schema} />
+	</head>
+	<body>
+		<Header />
+		<main class="home home--plain">
+			<section class="sec sec--dark intro">
+				<div class="wrap">
+					<header class="sec-head">
+						<h1>{t('projects.page.h1')}</h1>
+						<p>{t('projects.page.description')}</p>
+					</header>
+					{
+						services.length > 1 && (
+							<div class="filters" role="group" aria-label={t('projects.service')}>
+								<button type="button" data-filter="" aria-pressed="true">
+									{t('projects.filter.all')}
+								</button>
+								{services.map((service) => (
+									<button type="button" data-filter={service} aria-pressed="false">
+										{service}
+									</button>
+								))}
+							</div>
+						)
+					}
+				</div>
+			</section>
+			<section class="sec">
+				<div class="wrap">
+					{
+						projects.length > 0 ? (
+							<ul class="grid">
+								{projects.map((project) => (
+									<li data-service={project.data.service}>
+										<ProjectCard project={project} headingLevel="h2" />
+									</li>
+								))}
+							</ul>
+						) : (
+							<p class="empty">{t('projects.empty')}</p>
+						)
+					}
+				</div>
+			</section>
+		</main>
+		<Footer />
+		<FloatingContact />
+	</body>
+</html>
+
+<script>
+	// فلترة حسب الخدمة: كل المشاريع موجودة في الـ HTML (لجوجل)، الفلتر بيخبي بس
+	const buttons = document.querySelectorAll<HTMLButtonElement>('.filters button');
+	const cards = document.querySelectorAll<HTMLElement>('.grid li');
+	buttons.forEach((button) =>
+		button.addEventListener('click', () => {
+			const filter = button.dataset.filter;
+			buttons.forEach((b) => b.setAttribute('aria-pressed', String(b === button)));
+			cards.forEach((card) => (card.hidden = !!filter && card.dataset.service !== filter));
+		}),
+	);
+</script>
+
+<style>
+	.intro .sec-head {
+		margin-block-end: 0;
+	}
+	h1 {
+		margin: 0;
+		font-family: var(--font-display);
+		font-size: clamp(2rem, 5vw, 3.25rem);
+		font-weight: 800;
+		line-height: 1.3;
+		color: #fff;
+	}
+	.intro .sec-head p {
+		color: var(--on-ink);
+	}
+	.filters {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.5rem;
+		margin-block-start: 2rem;
+	}
+	.filters button {
+		min-height: 44px;
+		padding: 0.3rem 1.1rem;
+		border: 1.5px solid rgb(255 255 255 / 35%);
+		border-radius: 999px;
+		background: transparent;
+		color: #fff;
+		font: inherit;
+		font-size: 0.95rem;
+		cursor: pointer;
+	}
+	.filters button:hover {
+		border-color: #fff;
+	}
+	.filters button[aria-pressed='true'] {
+		border-color: var(--signal);
+		background: var(--signal);
+		color: var(--ink);
+		font-weight: 600;
+	}
+	.grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr));
+		gap: 18px;
+		margin: 0;
+		padding: 0;
+		list-style: none;
+	}
+	.grid li > :global(.card) {
+		aspect-ratio: 4 / 3;
+	}
+	.empty {
+		color: var(--muted);
+	}
+</style>

@@ -1,0 +1,78 @@
+---
+// Structured data للصفحة الرئيسية. بياخد الـ keys المتعبية بس،
+// عشان أسماء الـ keys ما تظهرش لجوجل.
+import { PHONE } from '../consts';
+import { filled, items } from '../i18n/ar';
+
+const siteUrl = new URL('/', Astro.site).href;
+
+const faqEntries = items('faq.items').flatMap((key) => {
+	const question = filled(`${key}.question`);
+	const answer = filled(`${key}.answer`);
+	return question && answer
+		? [{ '@type': 'Question', name: question, acceptedAnswer: { '@type': 'Answer', text: answer } }]
+		: [];
+});
+
+const services = items('services.items').flatMap((key) => {
+	const name = filled(`${key}.title`);
+	return name
+		? [{ '@type': 'Service', name, description: filled(`${key}.description`), areaServed: 'KW' }]
+		: [];
+});
+
+const areas = items('areas.items').flatMap((key) => {
+	const name = filled(key);
+	return name ? [{ '@type': 'AdministrativeArea', name }] : [];
+});
+
+const graph: Record<string, unknown>[] = [
+	{
+		'@type': 'WebSite',
+		'@id': `${siteUrl}#website`,
+		url: siteUrl,
+		name: filled('site.name'),
+		inLanguage: 'ar',
+	},
+	{
+		'@type': 'Plumber',
+		'@id': `${siteUrl}#business`,
+		url: siteUrl,
+		name: filled('site.name'),
+		description: filled('site.description'),
+		telephone: PHONE,
+		address: {
+			'@type': 'PostalAddress',
+			streetAddress: filled('footer.address'),
+			addressCountry: 'KW',
+		},
+		areaServed: areas.length > 0 ? areas : { '@type': 'Country', name: 'Kuwait' },
+		openingHoursSpecification: {
+			'@type': 'OpeningHoursSpecification',
+			dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
+			opens: '00:00',
+			closes: '23:59',
+		},
+		hasOfferCatalog:
+			services.length > 0
+				? {
+						'@type': 'OfferCatalog',
+						name: filled('services.title'),
+						itemListElement: services.map((itemOffered) => ({ '@type': 'Offer', itemOffered })),
+					}
+				: undefined,
+	},
+];
+
+if (faqEntries.length > 0) {
+	graph.push({ '@type': 'FAQPage', mainEntity: faqEntries });
+}
+
+// < عشان أي "<" في النص ما يقفلش الـ script
+const json = JSON.stringify({ '@context': 'https://schema.org', '@graph': graph }).replace(
+	/</g,
+	'\\u003c',
+);
+---
+
+<script is:inline type="application/ld+json" set:html={json} />

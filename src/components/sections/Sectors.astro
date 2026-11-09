@@ -1,0 +1,54 @@
+---
+import { items, t } from '../../i18n/ar';
+import SectionHead from './SectionHead.astro';
+---
+
+<section id="sectors" class="sec">
+	<div class="wrap">
+		<SectionHead name="sectors" />
+		<ul>
+			{
+				items('sectors.items').map((key) => (
+					<li>
+						<h3>{t(`${key}.title`)}</h3>
+						<p>{t(`${key}.description`)}</p>
+					</li>
+				))
+			}
+		</ul>
+	</div>
+</section>
+
+<style>
+	ul {
+		margin: 0;
+		padding: 0;
+		list-style: none;
+		border-block-start: 2px solid var(--ink);
+	}
+	li {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+		gap: 0.25rem 2rem;
+		align-items: baseline;
+		padding-block: 1.4rem;
+		border-block-end: 1px solid var(--line);
+	}
+	h3 {
+		margin: 0;
+		font-family: var(--font-display);
+		font-size: 1.3rem;
+		font-weight: 600;
+		line-height: 1.4;
+		color: var(--ink);
+	}
+	p {
+		margin: 0;
+		color: var(--muted);
+	}
+	@media (max-width: 720px) {
+		li {
+			grid-template-columns: 1fr;
+		}
+	}
+</style>

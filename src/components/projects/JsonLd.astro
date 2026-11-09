@@ -1,0 +1,13 @@
+---
+interface Props {
+	graph: Record<string, unknown>[];
+}
+
+// < عشان أي "<" في النص ما يقفلش الـ script
+const json = JSON.stringify({ '@context': 'https://schema.org', '@graph': Astro.props.graph }).replace(
+	/</g,
+	'\\u003c',
+);
+---
+
+<script is:inline type="application/ld+json" set:html={json} />

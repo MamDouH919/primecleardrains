@@ -6,30 +6,26 @@ import { defineConfig, fontProviders } from 'astro/config';
 
 // https://astro.build/config
 export default defineConfig({
-	site: 'https://example.com',
-	integrations: [mdx(), sitemap()],
+	site: 'https://primecleardrains.novaslash.com',
+	integrations: [mdx(), sitemap({ filter: (page) => !page.includes('/admin') })],
 	fonts: [
 		{
-			provider: fontProviders.local(),
-			name: 'Atkinson',
-			cssVariable: '--font-atkinson',
+			provider: fontProviders.google(),
+			name: 'IBM Plex Sans Arabic',
+			cssVariable: '--font-plex-arabic',
+			weights: [400, 600],
+			styles: ['normal'],
+			subsets: ['arabic', 'latin'],
 			fallbacks: ['sans-serif'],
-			options: {
-				variants: [
-					{
-						src: ['./src/assets/fonts/atkinson-regular.woff'],
-						weight: 400,
-						style: 'normal',
-						display: 'swap',
-					},
-					{
-						src: ['./src/assets/fonts/atkinson-bold.woff'],
-						weight: 700,
-						style: 'normal',
-						display: 'swap',
-					},
-				],
-			},
+		},
+		{
+			provider: fontProviders.google(),
+			name: 'Alexandria',
+			cssVariable: '--font-alexandria',
+			weights: [500, 600, 700, 800],
+			styles: ['normal'],
+			subsets: ['arabic', 'latin'],
+			fallbacks: ['sans-serif'],
 		},
 	],
 });

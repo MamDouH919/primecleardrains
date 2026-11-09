@@ -1,0 +1,381 @@
+---
+import { Image } from 'astro:assets';
+import { render } from 'astro:content';
+import BaseHead from '../../components/BaseHead.astro';
+import FloatingContact from '../../components/FloatingContact.astro';
+import Footer from '../../components/Footer.astro';
+import FormattedDate from '../../components/FormattedDate.astro';
+import Header from '../../components/Header.astro';
+import BeforeAfter from '../../components/projects/BeforeAfter.astro';
+import Gallery from '../../components/projects/Gallery.astro';
+import JsonLd from '../../components/projects/JsonLd.astro';
+import ProjectCard from '../../components/projects/ProjectCard.astro';
+import { PHONE, WHATSAPP, WHATSAPP_MESSAGE } from '../../consts';
+import { filled, t } from '../../i18n/ar';
+import { fullImage, getProjects, type Project, projectImages, projectUrl } from '../../lib/projects';
+import '../../styles/home.css';
+
+export async function getStaticPaths() {
+	const projects = await getProjects();
+	return projects.map((project) => ({
+		params: { slug: project.id },
+		props: {
+			project,
+			// أعمال تانية: نفس الخدمة الأول
+			related: projects
+				.filter((p) => p.id !== project.id)
+				.sort((a, b) => Number(b.data.service === project.data.service) - Number(a.data.service === project.data.service))
+				.slice(0, 3),
+		},
+	}));
+}
+
+interface Props {
+	project: Project;
+	related: Project[];
+}
+
+const { project, related } = Astro.props;
+const { title, description, date, service, area, cover, coverAlt, before, after, photos } = project.data;
+const { Content } = await render(project);
+// صورة قبل/بعد واحدة بس = صورة مجمّعة فيها الاتنين، بتظهر كاملة مكان الغلاف
+const combined = before && after ? undefined : (before ?? after);
+const whatsappURL = `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(`${WHATSAPP_MESSAGE} — ${title}`)}`;
+
+// ───── Schema: كل صورة ImageObject بوصف ومكان ومالك، عشان تظهر في Google Images ─────
+const site = Astro.site!;
+const pageUrl = new URL(projectUrl(project), site).href;
+const siteName = filled('site.name');
+const business = { '@id': new URL('/#business', site).href };
+const images = await Promise.all(
+	projectImages(project).map(async ({ image, alt }, i) => {
+		const full = await fullImage(image);
+		const url = new URL(full.src, site).href;
+		return {
+			'@type': 'ImageObject',
+			'@id': `${pageUrl}#image-${i + 1}`,
+			contentUrl: url,
+			url,
+			width: full.width,
+			height: full.height,
+			caption: alt,
+			name: alt,
+			contentLocation: { '@type': 'Place', name: `${area}، الكويت` },
+			creator: { '@type': 'Organization', name: siteName },
+			creditText: siteName,
+			copyrightNotice: `© ${date.getFullYear()} ${siteName}`,
+			copyrightHolder: business,
+			datePublished: date.toISOString().slice(0, 10),
+		};
+	}),
+);
+const schema = [
+	{
+		'@type': 'WebPage',
+		'@id': pageUrl,
+		url: pageUrl,
+		name: title,
+		description,
+		inLanguage: 'ar',
+		datePublished: date.toISOString().slice(0, 10),
+		isPartOf: { '@id': new URL('/#website', site).href },
+		primaryImageOfPage: { '@id': images[0]['@id'] },
+		image: images,
+		about: {
+			'@type': 'Service',
+			name: service,
+			provider: business,
+			areaServed: { '@type': 'City', name: area },
+		},
+	},
+	{
+		'@type': 'BreadcrumbList',
+		itemListElement: [
+			{ '@type': 'ListItem', position: 1, name: filled('nav.home'), item: new URL('/', site).href },
+			{ '@type': 'ListItem', position: 2, name: filled('projects.page.h1'), item: new URL('/projects/', site).href },
+			{ '@type': 'ListItem', position: 3, name: title, item: pageUrl },
+		],
+	},
+];
+---
+
+<!doctype html>
+<html lang="ar" dir="rtl">
+	<head>
+		<BaseHead title={`${title} | ${t('site.name')}`} description={description} image={cover} />
+		<JsonLd graph={schema} />
+	</head>
+	<body>
+		<Header />
+		<main class="home home--plain">
+			<article>
+				<header class="sec sec--dark top">
+					<div class="wrap">
+						<nav class="crumbs" aria-label="مسار الصفحة">
+							<a href="/">{t('nav.home')}</a>
+							<span aria-hidden="true">/</span>
+							<a href="/projects/">{t('projects.page.h1')}</a>
+						</nav>
+						<h1>{title}</h1>
+						<p class="lead">{description}</p>
+						<dl class="facts">
+							<div>
+								<dt>{t('projects.service')}</dt>
+								<dd>{service}</dd>
+							</div>
+							<div>
+								<dt>{t('projects.area')}</dt>
+								<dd>{area}</dd>
+							</div>
+							<div>
+								<dt>{t('projects.date')}</dt>
+								<dd><FormattedDate date={date} /></dd>
+							</div>
+						</dl>
+					</div>
+				</header>
+
+				<div class="wrap media">
+					{
+						before && after ? (
+							<BeforeAfter before={before} after={after} title={title} />
+						) : combined ? (
+							<Image
+								class="combined"
+								draggable="false"
+								src={combined}
+								alt={`${title} — ${t('projects.before')} و${t('projects.after')}`}
+								widths={[640, 1000, 1400]}
+								sizes="(max-width: 1100px) 100vw, 1060px"
+								priority
+							/>
+						) : (
+							<Image
+								class="cover"
+								src={cover}
+								alt={coverAlt}
+								widths={[640, 1000, 1400]}
+								sizes="(max-width: 1100px) 100vw, 1060px"
+								priority
+							/>
+						)
+					}
+				</div>
+
+				<div class="sec body">
+					<div class="wrap">
+						<div class="prose">
+							<Content />
+						</div>
+						{
+							photos.length > 0 && (
+								<section class="photos" aria-labelledby="gallery-title">
+									<h2 id="gallery-title">{t('projects.gallery')}</h2>
+									<Gallery photos={photos} />
+								</section>
+							)
+						}
+					</div>
+				</div>
+			</article>
+
+			<section class="sec sec--tint ask">
+				<div class="wrap">
+					<div>
+						<h2>{t('projects.cta.title')}</h2>
+						<p>{t('projects.cta.text')}</p>
+					</div>
+					<div class="actions">
+						<a class="btn btn--call" href={`tel:${PHONE}`}>
+							{t('hero.cta.call')} <bdi dir="ltr">{PHONE}</bdi>
+						</a>
+						<a class="btn btn--wa" href={whatsappURL} target="_blank" rel="noopener">{t('hero.cta.whatsapp')}</a>
+					</div>
+				</div>
+			</section>
+
+			{
+				related.length > 0 && (
+					<section class="sec related">
+						<div class="wrap">
+							<header class="sec-head">
+								<h2>{t('projects.related')}</h2>
+							</header>
+							<ul>
+								{related.map((p) => (
+									<li>
+										<ProjectCard project={p} />
+									</li>
+								))}
+							</ul>
+						</div>
+					</section>
+				)
+			}
+		</main>
+		<Footer />
+		<FloatingContact />
+	</body>
+</html>
+
+<style>
+	.top {
+		padding-block-end: clamp(6rem, 14vw, 10rem);
+	}
+	.crumbs {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.5rem;
+		margin-block-end: 1.25rem;
+		font-size: 0.95rem;
+	}
+	.crumbs a {
+		color: var(--on-ink);
+	}
+	.crumbs a:hover {
+		color: #fff;
+	}
+	h1 {
+		max-width: 48rem;
+		margin: 0;
+		font-family: var(--font-display);
+		font-size: clamp(1.75rem, 4.5vw, 3rem);
+		font-weight: 800;
+		line-height: 1.35;
+		color: #fff;
+	}
+	.lead {
+		max-width: 44rem;
+		margin: 1rem 0 0;
+		font-size: 1.15rem;
+	}
+	.facts {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 1rem 2.5rem;
+		margin: 2rem 0 0;
+		padding-block-start: 1.25rem;
+		border-block-start: 1px solid rgb(255 255 255 / 18%);
+	}
+	dt {
+		font-size: 0.85rem;
+		opacity: 0.7;
+	}
+	dd {
+		margin: 0;
+		color: #fff;
+		font-family: var(--font-display);
+		font-weight: 600;
+	}
+
+	/* الصورة الرئيسية طالعة فوق الخلفية الغامقة */
+	.media {
+		margin-block-start: clamp(-8rem, -11vw, -4.5rem);
+	}
+	.media > :global(.cover) {
+		display: block;
+		width: 100%;
+		max-height: 80vh;
+		object-fit: cover;
+		border-radius: 14px;
+		box-shadow: 0 20px 50px rgb(2 18 13 / 25%);
+	}
+	/* الصورة المجمّعة بتظهر كاملة من غير قص عشان قبل وبعد يبانوا */
+	.media > :global(.combined) {
+		display: block;
+		width: 100%;
+		height: auto;
+		border-radius: 14px;
+		/* ممنوع تحديد الصورة أو سحبها أو قايمة الحفظ على الموبايل */
+		user-select: none;
+		-webkit-user-select: none;
+		-webkit-user-drag: none;
+		-webkit-touch-callout: none;
+		box-shadow: 0 20px 50px rgb(2 18 13 / 25%);
+	}
+	.media > :global(.ba) {
+		box-shadow: 0 20px 50px rgb(2 18 13 / 25%);
+	}
+
+	.body {
+		padding-block-start: clamp(2.5rem, 5vw, 4rem);
+	}
+	.prose {
+		max-width: 46rem;
+		color: rgb(var(--gray-dark));
+	}
+	.prose :global(h2),
+	.photos h2 {
+		margin: 2rem 0 0.75rem;
+		font-family: var(--font-display);
+		font-size: clamp(1.4rem, 3vw, 1.9rem);
+		font-weight: 700;
+		line-height: 1.4;
+		color: var(--ink);
+	}
+	.prose :global(h3) {
+		margin: 1.5rem 0 0.5rem;
+		font-family: var(--font-display);
+		font-size: 1.25rem;
+		color: var(--ink);
+	}
+	.prose :global(> :first-child) {
+		margin-block-start: 0;
+	}
+	.photos {
+		margin-block-start: clamp(2.5rem, 5vw, 4rem);
+	}
+	.photos h2 {
+		margin-block-start: 0;
+		margin-block-end: 1.25rem;
+	}
+
+	.ask .wrap {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		justify-content: space-between;
+		gap: 1.5rem 3rem;
+	}
+	.ask h2 {
+		margin: 0;
+		font-family: var(--font-display);
+		font-size: clamp(1.5rem, 3.5vw, 2.25rem);
+		font-weight: 800;
+		color: var(--ink);
+	}
+	.ask p {
+		margin: 0.4rem 0 0;
+		color: var(--muted);
+	}
+	.actions {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.75rem;
+	}
+	.btn--wa {
+		border: 2px solid var(--ink);
+		color: var(--ink);
+	}
+	.btn--wa:hover {
+		background: var(--ink);
+		color: #fff;
+	}
+
+	.related ul {
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr));
+		gap: 18px;
+		margin: 0;
+		padding: 0;
+		list-style: none;
+	}
+	.related li > :global(.card) {
+		aspect-ratio: 4 / 3;
+	}
+	@media (max-width: 480px) {
+		.actions .btn {
+			width: 100%;
+		}
+	}
+</style>

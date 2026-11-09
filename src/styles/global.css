@@ -5,8 +5,21 @@
  */
 
 :root {
-	--accent: #2337ff;
-	--accent-dark: #000d8a;
+	/* اللون الأساسي للموقع — غيّره هنا بس */
+	--accent: #009966;
+	--accent-dark: color-mix(in srgb, var(--accent), black 60%);
+	/* باقي الألوان متشتقة من --accent، فبتتغير معاه */
+	--accent-strong: color-mix(in srgb, var(--accent), black 22%); /* نص وأزرار على خلفية فاتحة */
+	--accent-bright: color-mix(in srgb, var(--accent), white 30%); /* المياه في المواسير */
+	--ink: color-mix(in srgb, var(--accent), #02120d 85%); /* الخلفيات الغامقة والعناوين */
+	--on-ink: color-mix(in srgb, var(--accent), white 85%); /* النص على الخلفية الغامقة */
+	--mist: color-mix(in srgb, var(--accent), white 94%); /* خلفية الأقسام الفاتحة */
+	--muted: color-mix(in srgb, var(--ink), white 25%); /* النص الثانوي */
+	--line: color-mix(in srgb, var(--ink), white 82%); /* الخطوط الفاصلة */
+	--pvc: color-mix(in srgb, var(--accent), #b9c4c0 88%); /* جسم الماسورة */
+	--pvc-dark: color-mix(in srgb, var(--accent), #7f8f89 85%);
+	--signal: #ffc52e; /* لون أزرار الاتصال */
+	--font-display: var(--font-alexandria), sans-serif;
 	--black: 15, 18, 25;
 	--gray: 96, 115, 159;
 	--gray-light: 229, 233, 240;
@@ -17,10 +30,10 @@
 		0 16px 32px rgba(var(--gray), 33%);
 }
 body {
-	font-family: var(--font-atkinson);
+	font-family: var(--font-plex-arabic), sans-serif;
 	margin: 0;
 	padding: 0;
-	text-align: left;
+	text-align: start;
 	background: linear-gradient(var(--gray-gradient)) no-repeat;
 	background-size: 100% 600px;
 	word-wrap: break-word;
@@ -44,9 +57,11 @@ h6 {
 	margin: 0 0 0.5rem 0;
 	color: rgb(var(--black));
 	line-height: 1.2;
+	color: var(--accent);
 }
 h1 {
 	font-size: 3.052em;
+	color: var(--accent);
 }
 h2 {
 	font-size: 2.441em;
@@ -104,8 +119,8 @@ pre > code {
 	all: unset;
 }
 blockquote {
-	border-left: 4px solid var(--accent);
-	padding: 0 0 0 20px;
+	border-inline-start: 4px solid var(--accent);
+	padding-inline-start: 20px;
 	margin: 0;
 	font-size: 1.333em;
 }

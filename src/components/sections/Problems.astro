@@ -1,0 +1,46 @@
+---
+import { PHONE } from '../../consts';
+import { items, t } from '../../i18n/ar';
+import SectionHead from './SectionHead.astro';
+---
+
+<section id="problems" class="sec sec--dark">
+	<div class="wrap">
+		<SectionHead name="problems" />
+		<dl>
+			{
+				items('problems.items').map((key) => (
+					<div>
+						<dt>{t(`${key}.title`)}</dt>
+						<dd>{t(`${key}.description`)}</dd>
+					</div>
+				))
+			}
+		</dl>
+		<a class="btn btn--call" href={`tel:${PHONE}`}>{t('problems.cta')}</a>
+	</div>
+</section>
+
+<style>
+	dl {
+		display: grid;
+		grid-template-columns: repeat(2, 1fr);
+		gap: 2.25rem clamp(2rem, 5vw, 4.5rem);
+		margin: 0 0 2.75rem;
+	}
+	dt {
+		font-family: var(--font-display);
+		font-size: 1.3rem;
+		font-weight: 600;
+		line-height: 1.4;
+		color: var(--signal);
+	}
+	dd {
+		margin: 0.4rem 0 0;
+	}
+	@media (max-width: 720px) {
+		dl {
+			grid-template-columns: 1fr;
+		}
+	}
+</style>

@@ -1,0 +1,36 @@
+---
+import { items, t } from '../../i18n/ar';
+import SectionHead from './SectionHead.astro';
+---
+
+<section id="areas" class="sec sec--tint">
+	<div class="wrap">
+		<SectionHead name="areas" />
+		<ul>
+			{items('areas.items').map((key) => <li>{t(key)}</li>)}
+		</ul>
+	</div>
+</section>
+
+<style>
+	.sec {
+		scroll-margin-block-start: 4rem;
+	}
+	ul {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.6rem;
+		margin: 0;
+		padding: 0;
+		list-style: none;
+	}
+	li {
+		padding: 0.45rem 1.1rem;
+		border: 1px solid var(--pvc-dark);
+		border-radius: 999px;
+		background: #fff;
+		color: var(--ink);
+		font-size: 1rem;
+		line-height: 1.5;
+	}
+</style>

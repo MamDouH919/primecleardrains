@@ -1,0 +1,74 @@
+---
+import { items, t } from '../../i18n/ar';
+import SectionHead from './SectionHead.astro';
+
+const reviews = items('reviews.items');
+---
+
+{
+	reviews.length > 0 && (
+		<section id="reviews" class="sec">
+			<div class="wrap">
+				<SectionHead name="reviews" noIntro />
+				<div class="grid">
+					{reviews.map((key) => (
+						<figure>
+							<blockquote>{t(`${key}.text`)}</blockquote>
+							<figcaption>
+								<strong>{t(`${key}.name`)}</strong>
+								<span>{t(`${key}.area`)}</span>
+							</figcaption>
+						</figure>
+					))}
+				</div>
+			</div>
+		</section>
+	)
+}
+
+<style>
+	.grid {
+		display: grid;
+		grid-template-columns: 1.5fr 1fr;
+		gap: 2.5rem clamp(2rem, 5vw, 4.5rem);
+	}
+	figure {
+		margin: 0;
+	}
+	/* أول رأي أكبر وواخد الصف كله في العمود بتاعه */
+	figure:first-child {
+		grid-row: span 2;
+	}
+	figure:first-child blockquote {
+		font-family: var(--font-display);
+		font-size: clamp(1.35rem, 2.4vw, 1.85rem);
+		font-weight: 500;
+		line-height: 1.6;
+		color: var(--ink);
+	}
+	blockquote {
+		margin: 0;
+		padding: 0;
+		border: 0;
+		font-size: 1.0625rem;
+	}
+	figcaption {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0 0.75rem;
+		margin-block-start: 0.75rem;
+		font-size: 0.95rem;
+		color: var(--muted);
+	}
+	strong {
+		color: var(--ink);
+	}
+	@media (max-width: 720px) {
+		.grid {
+			grid-template-columns: 1fr;
+		}
+		figure:first-child {
+			grid-row: auto;
+		}
+	}
+</style>

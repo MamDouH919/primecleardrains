@@ -1,59 +1,101 @@
 ---
 import BaseHead from '../components/BaseHead.astro';
+import FloatingContact from '../components/FloatingContact.astro';
 import Footer from '../components/Footer.astro';
 import Header from '../components/Header.astro';
-import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
+import HomeSchema from '../components/HomeSchema.astro';
+import About from '../components/sections/About.astro';
+import CallToAction from '../components/sections/CallToAction.astro';
+import FAQ from '../components/sections/FAQ.astro';
+import Hero from '../components/sections/Hero.astro';
+import LatestPosts from '../components/sections/LatestPosts.astro';
+import Problems from '../components/sections/Problems.astro';
+import Process from '../components/sections/Process.astro';
+import Projects from '../components/sections/Projects.astro';
+import Regions from '../components/sections/Regions.astro';
+import Sectors from '../components/sections/Sectors.astro';
+import Services from '../components/sections/Services.astro';
+import WhyUs from '../components/sections/WhyUs.astro';
+import { missingKeys, t } from '../i18n/ar';
+import '../styles/home.css';
+
+// تنبيه وقت الـ build لو فيه نصوص لسه ما اتكتبتش
+const missing = missingKeys();
+if (import.meta.env.PROD && missing.length > 0) {
+	console.warn(`[home] ${missing.length} text keys are still empty in src/i18n/ar.ts`);
+}
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang="ar" dir="rtl">
 	<head>
-		<BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
+		<BaseHead title={t('meta.title')} description={t('meta.description')} />
+		<HomeSchema />
 	</head>
 	<body>
 		<Header />
-		<main>
-			<h1>🧑‍🚀 Hello, Astronaut!</h1>
-			<p>
-				Welcome to the official <a href="https://astro.build/">Astro</a> blog starter template. This
-				template serves as a lightweight, minimally-styled starting point for anyone looking to
-				build a personal website, blog, or portfolio with Astro.
-			</p>
-			<p>
-				This template comes with a few integrations already configured in your{' '}
-				<code>astro.config.mjs</code> file. You can customize your setup with{' '}
-				<a href="https://astro.build/integrations">Astro Integrations</a> to add tools like
-				Tailwind, React, or Vue to your project.
-			</p>
-			<p>Here are a few ideas on how to get started with the template:</p>
-			<ul>
-				<li>
-					Edit this page in <code>src/pages/index.astro</code>
-				</li>
-				<li>
-					Edit the site header items in <code>src/components/Header.astro</code>
-				</li>
-				<li>
-					Add your name to the footer in <code>src/components/Footer.astro</code>
-				</li>
-				<li>
-					Check out the included blog posts in <code>src/content/blog/</code>
-				</li>
-				<li>
-					Customize the blog post page layout in <code>src/layouts/BlogPost.astro</code>
-				</li>
-			</ul>
-			<p>
-				Have fun! If you get stuck, remember to{' '}
-				<a href="https://docs.astro.build/">read the docs</a> or{' '}
-				<a href="https://astro.build/chat">join us on Discord</a> to ask questions.
-			</p>
-			<p>
-				Looking for a blog template with a bit more personality? Check out{' '}
-				<a href="https://github.com/Charca/astro-blog-template">astro-blog-template</a> by{' '}
-				<a href="https://twitter.com/Charca">Maxi Ferreira</a>.
-			</p>
+		<main class="home">
+			<Hero />
+			<div class="flow">
+				<div class="pipe" aria-hidden="true"><span class="water"></span></div>
+				<Services />
+				<About />
+				<Problems />
+				<Process />
+				<Projects />
+				<WhyUs />
+				<Sectors />
+				<Regions />
+				<LatestPosts />
+				<FAQ />
+			</div>
+			<CallToAction />
 		</main>
 		<Footer />
+		<FloatingContact />
 	</body>
 </html>
+
+<style>
+	.flow {
+		position: relative;
+	}
+
+	/* الماسورة الرئيسية: بتتملي مياه مع السكرول */
+	.pipe {
+		position: absolute;
+		inset-block: 0;
+		inset-inline-start: var(--pipe-x);
+		z-index: 1;
+		width: var(--pipe-w);
+		box-sizing: border-box;
+		border-inline: 3px solid var(--pvc);
+		background: var(--pvc-dark);
+	}
+	.water {
+		display: block;
+		height: 100%;
+		background: var(--accent-bright);
+		transform-origin: top;
+	}
+
+	@supports (animation-timeline: scroll()) {
+		@media (prefers-reduced-motion: no-preference) {
+			/* خصائص منفصلة: لو اتكتبت shorthand الـ minifier بيدمجها والمتصفح بيرفضها */
+			.water {
+				animation-name: fill-main;
+				animation-timing-function: linear;
+				animation-timeline: scroll(root);
+			}
+		}
+	}
+
+	@keyframes fill-main {
+		from {
+			transform: scaleY(0);
+		}
+		to {
+			transform: scaleY(1);
+		}
+	}
+</style>

@@ -1,0 +1,133 @@
+# إعدادات Decap CMS — https://decapcms.org/docs/configuration-options/
+locale: ar
+
+backend:
+  name: github
+  repo: OWNER/drain-kuwait # غيّرها لاسم الريبو على GitHub
+  branch: main
+  base_url: https://primecleardrains.novaslash.com # غيّرها لدومينك
+  auth_endpoint: api/auth
+
+# للتعديل محلياً بدون تسجيل دخول: شغّل `npm run cms` جنب `npm run dev`
+local_backend: true
+
+# الصور تتحفظ جوه src/assets عشان Astro يعمل لها optimization
+media_folder: src/assets/blog
+public_folder: ../../assets/blog
+
+collections:
+  - name: blog
+    label: المقالات
+    label_singular: مقال
+    folder: src/content/blog
+    create: true
+    slug: '{{fields.slug}}' # اسم الملف بياخد قيمة حقل الرابط تحت
+    extension: md
+    format: frontmatter
+    sortable_fields: [pubDate, title]
+    summary: '{{title}} — {{pubDate}}'
+    fields:
+      - { name: title, label: العنوان, widget: string }
+      # Astro بيستخدم slug من الـ frontmatter كرابط المقال: /blog/<slug>/
+      - name: slug
+        label: الرابط (Slug)
+        widget: string
+        hint: 'الجزء اللي بيظهر في رابط المقال بعد /blog/ — افصل الكلمات بشرطة، مثال: تسليك-المجاري-في-الكويت'
+        pattern: ['^[^\s/?#%]+$', 'الرابط ما ينفعش يحتوي على مسافات أو الرموز / ? # %']
+      - { name: description, label: الوصف المختصر, widget: text }
+      - name: pubDate
+        label: تاريخ النشر
+        widget: datetime
+        format: YYYY-MM-DD
+        date_format: YYYY-MM-DD
+        time_format: false
+      - name: updatedDate
+        label: تاريخ آخر تحديث
+        widget: datetime
+        format: YYYY-MM-DD
+        date_format: YYYY-MM-DD
+        time_format: false
+        required: false
+      - { name: heroImage, label: الصورة الرئيسية, widget: image, required: false }
+      - { name: body, label: المحتوى, widget: markdown }
+
+  - name: projects
+    label: معرض الأعمال
+    label_singular: مشروع
+    folder: src/content/projects
+    create: true
+    slug: '{{fields.slug}}'
+    extension: md
+    format: frontmatter
+    sortable_fields: [date, title]
+    summary: '{{title}} — {{area}}'
+    # صور المشاريع ليها فولدر لوحدها
+    media_folder: /src/assets/projects
+    public_folder: ../../assets/projects
+    fields:
+      - name: title
+        label: عنوان المشروع
+        widget: string
+        hint: 'اكتب الخدمة + المنطقة، مثال: تسليك مجاري مطبخ في الجهراء — ده اللي بيظهر في جوجل'
+      - name: slug
+        label: الرابط (Slug)
+        widget: string
+        hint: 'بيظهر بعد /projects/ — مثال: تسليك-مجاري-مطبخ-الجهراء'
+        pattern: ['^[^\s/?#%]+$', 'الرابط ما ينفعش يحتوي على مسافات أو الرموز / ? # %']
+      - name: description
+        label: وصف مختصر
+        widget: text
+        hint: 'جملتين عن المشكلة والحل (حوالي 150 حرف) — بيظهر تحت العنوان في جوجل'
+      - name: service
+        label: الخدمة
+        hint: 'لازم تطابق أسماء الخدمات في src/i18n/ar.ts — لو غيّرت هناك غيّر هنا'
+        widget: select
+        options:
+          - تسليك المجاري والبالوعات
+          - كشف تسربات المياه
+          - كشف وتسليك المجاري والأنابيب
+          - تركيب وصيانة الأدوات الصحية
+          - تأسيس وتركيب شبكات المياه والصرف الصحي
+          - تركيب وصيانة المضخات والسخانات
+          - تنظيف جور السرداب
+      - { name: area, label: المنطقة, widget: string, hint: 'مثال: الجهراء، السالمية، حولي' }
+      - name: date
+        label: تاريخ التنفيذ
+        widget: datetime
+        format: YYYY-MM-DD
+        date_format: YYYY-MM-DD
+        time_format: false
+      - name: featured
+        label: مشروع مميز (يظهر الأول في الصفحة الرئيسية)
+        widget: boolean
+        default: false
+        required: false
+      - name: cover
+        label: صورة الغلاف
+        widget: image
+        hint: 'صورة عرضية واضحة، 1600 بكسل عرض أو أكتر. سمّي الملف بالإنجليزي باسم وصفي قبل الرفع: kitchen-drain-jahra.jpg'
+      - name: coverAlt
+        label: وصف صورة الغلاف
+        widget: string
+        hint: 'اوصف اللي في الصورة بالظبط، مثال: فني يسلّك ماسورة مطبخ مسدودة بالسوستة في الجهراء'
+      - name: before
+        label: صورة قبل (اختياري)
+        widget: image
+        required: false
+        hint: 'لو رفعت صورة قبل وصورة بعد، بيظهر سلايدر مقارنة (خليهم من نفس الزاوية). لو عندك صورة واحدة فيها قبل وبعد مع بعض، ارفعها هنا لوحدها وهتظهر كاملة فوق الصفحة'
+      - { name: after, label: صورة بعد (اختياري), widget: image, required: false }
+      - name: photos
+        label: صور تانية من الموقع
+        label_singular: صورة
+        widget: list
+        required: false
+        fields:
+          - { name: image, label: الصورة, widget: image }
+          - name: alt
+            label: وصف الصورة
+            widget: string
+            hint: 'بيظهر تحت الصورة وبيقرأه جوجل — اكتب المكان والشغل اللي بيتعمل'
+      - name: body
+        label: تفاصيل الشغل
+        widget: markdown
+        hint: 'إيه كانت المشكلة، عملتوا إيه، استخدمتوا أنهي معدات، والنتيجة. 150 كلمة أو أكتر بتفرق جداً في جوجل'

@@ -1,0 +1,15 @@
+# انسخه إلى /etc/systemd/system/decap-oauth.service
+[Unit]
+Description=Decap CMS GitHub OAuth
+After=network.target
+
+[Service]
+ExecStart=/usr/bin/node /var/www/decap-oauth/oauth-server.mjs
+Environment=GITHUB_CLIENT_ID=ضع_هنا
+Environment=GITHUB_CLIENT_SECRET=ضع_هنا
+Environment=PORT=3005
+Restart=always
+User=www-data
+
+[Install]
+WantedBy=multi-user.target

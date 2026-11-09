@@ -1,0 +1,17 @@
+---
+import { t } from '../../i18n/ar';
+
+interface Props {
+	/** بادئة الـ keys، مثال: "services" لـ services.title و services.intro */
+	name: string;
+	/** لو القسم من غير intro */
+	noIntro?: boolean;
+}
+
+const { name, noIntro = false } = Astro.props;
+---
+
+<header class="sec-head">
+	<h2>{t(`${name}.title`)}</h2>
+	{!noIntro && <p>{t(`${name}.intro`)}</p>}
+</header>

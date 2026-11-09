@@ -1,0 +1,211 @@
+---
+import type { ImageMetadata } from 'astro';
+import { Image } from 'astro:assets';
+import { t } from '../../i18n/ar';
+import { fullImage } from '../../lib/projects';
+
+interface Props {
+	photos: { image: ImageMetadata; alt: string }[];
+}
+
+// كل صورة جواها لينك للنسخة الكبيرة: جوجل بيوصلها، والـ JavaScript بيفتحها في lightbox
+const photos = await Promise.all(
+	Astro.props.photos.map(async (photo) => ({ ...photo, full: await fullImage(photo.image) })),
+);
+---
+
+<ul class="gallery">
+	{
+		photos.map(({ image, alt, full }) => (
+			<li class:list={{ wide: image.width > image.height * 1.2 }}>
+				<figure>
+					<a href={full.src} data-w={full.width} data-h={full.height}>
+						<Image src={image} alt={alt} widths={[400, 700, 1000]} sizes="(max-width: 720px) 100vw, 50vw" />
+					</a>
+					<figcaption>{alt}</figcaption>
+				</figure>
+			</li>
+		))
+	}
+</ul>
+
+<dialog class="lightbox" aria-label={t('projects.gallery')}>
+	<img alt="" />
+	<p class="caption"></p>
+	<button type="button" class="close" aria-label={t('projects.close')}>✕</button>
+	<button type="button" class="nav prev" aria-label="السابقة">‹</button>
+	<button type="button" class="nav next" aria-label="التالية">›</button>
+</dialog>
+
+<script>
+	const links = [...document.querySelectorAll<HTMLAnchorElement>('.gallery a')];
+	const box = document.querySelector<HTMLDialogElement>('.lightbox');
+	if (box && links.length) {
+		const img = box.querySelector('img')!;
+		const caption = box.querySelector('.caption')!;
+		let current = 0;
+
+		const show = (i: number) => {
+			current = (i + links.length) % links.length;
+			const link = links[current];
+			const thumb = link.querySelector('img')!;
+			img.src = link.href;
+			img.width = Number(link.dataset.w);
+			img.height = Number(link.dataset.h);
+			img.alt = thumb.alt;
+			caption.textContent = thumb.alt;
+		};
+
+		links.forEach((link, i) =>
+			link.addEventListener('click', (e) => {
+				e.preventDefault();
+				show(i);
+				box.showModal();
+			}),
+		);
+		// RTL: "التالية" بتروح ناحية الشمال
+		box.querySelector('.next')!.addEventListener('click', () => show(current + 1));
+		box.querySelector('.prev')!.addEventListener('click', () => show(current - 1));
+		box.querySelector('.close')!.addEventListener('click', () => box.close());
+		box.addEventListener('click', (e) => e.target === box && box.close());
+		box.addEventListener('keydown', (e) => {
+			if (e.key === 'ArrowLeft') show(current + 1);
+			if (e.key === 'ArrowRight') show(current - 1);
+		});
+		box.querySelectorAll('.nav').forEach((b) => b.toggleAttribute('hidden', links.length < 2));
+	}
+</script>
+
+<style>
+	.gallery {
+		display: grid;
+		grid-template-columns: repeat(2, 1fr);
+		gap: 18px;
+		margin: 0;
+		padding: 0;
+		list-style: none;
+	}
+	.wide {
+		grid-column: 1 / -1;
+	}
+	figure {
+		margin: 0;
+	}
+	a {
+		display: block;
+		overflow: hidden;
+		border-radius: 12px;
+		background: var(--mist);
+		cursor: zoom-in;
+	}
+	a :global(img) {
+		display: block;
+		width: 100%;
+		height: auto;
+		aspect-ratio: 4 / 3;
+		object-fit: cover;
+		border-radius: 0;
+		transition: transform 0.5s ease;
+	}
+	.wide a :global(img) {
+		aspect-ratio: 16 / 8;
+	}
+	a:hover :global(img) {
+		transform: scale(1.03);
+	}
+	figcaption {
+		margin-block-start: 0.5rem;
+		color: var(--muted);
+		font-size: 0.95rem;
+		line-height: 1.6;
+	}
+	@media (max-width: 600px) {
+		.gallery {
+			grid-template-columns: 1fr;
+		}
+		.wide a :global(img) {
+			aspect-ratio: 4 / 3;
+		}
+	}
+
+	.lightbox {
+		width: 100vw;
+		max-width: none;
+		height: 100dvh;
+		max-height: none;
+		margin: 0;
+		padding: 3.5rem 1rem 1rem;
+		box-sizing: border-box;
+		border: 0;
+		background: rgb(2 12 9 / 94%);
+		color: #fff;
+	}
+	.lightbox[open] {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		gap: 0.75rem;
+	}
+	.lightbox::backdrop {
+		background: transparent;
+	}
+	.lightbox img {
+		min-height: 0;
+		max-width: 100%;
+		max-height: calc(100% - 3rem);
+		width: auto;
+		height: auto;
+		object-fit: contain;
+		border-radius: 8px;
+	}
+	.caption {
+		margin: 0;
+		max-width: 50rem;
+		text-align: center;
+		font-size: 1rem;
+	}
+	.lightbox button {
+		position: absolute;
+		display: grid;
+		place-items: center;
+		width: 48px;
+		height: 48px;
+		border: 0;
+		border-radius: 50%;
+		background: rgb(255 255 255 / 14%);
+		color: #fff;
+		font-size: 1.6rem;
+		line-height: 1;
+		cursor: pointer;
+	}
+	.lightbox button:hover {
+		background: rgb(255 255 255 / 26%);
+	}
+	.lightbox button:focus-visible {
+		outline: 3px solid var(--signal);
+	}
+	.close {
+		inset-block-start: 0.75rem;
+		inset-inline-end: 0.75rem;
+	}
+	.nav {
+		top: 50%;
+		translate: 0 -50%;
+		font-size: 2.2rem !important;
+	}
+	.nav[hidden] {
+		display: none !important;
+	}
+	.prev {
+		inset-inline-start: 0.75rem;
+	}
+	.next {
+		inset-inline-end: 0.75rem;
+	}
+	@media (prefers-reduced-motion: reduce) {
+		a :global(img) {
+			transition: none;
+		}
+	}
+</style>

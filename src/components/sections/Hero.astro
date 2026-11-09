@@ -1,0 +1,182 @@
+---
+import { PHONE, WHATSAPP, WHATSAPP_MESSAGE } from '../../consts';
+import { items, t } from '../../i18n/ar';
+
+const whatsappURL = `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(WHATSAPP_MESSAGE)}`;
+const pipes = [
+	// بتبدأ فوق الرسمة عشان توصل لأعلى الـ hero مهما كان ارتفاعه
+	'M60 -600V200Q60 250 110 250H150Q200 250 200 300V460',
+	'M260 -600V460',
+	'M470 -600V120Q470 170 420 170H370Q320 170 320 220V460',
+];
+const collars = [
+	[60, 96],
+	[260, 60],
+	[260, 330],
+	[470, 60],
+	[200, 380],
+	[320, 300],
+];
+---
+
+<section class="hero">
+	<svg
+		class="art"
+		viewBox="0 0 520 460"
+		preserveAspectRatio="xMidYMax meet"
+		aria-hidden="true"
+		focusable="false"
+	>
+		<g fill="none">
+			{pipes.map((d) => <path class="shell" d={d} />)}
+			{pipes.map((d, i) => <path class="flow" d={d} pathLength="1" style={`--i:${i}`} />)}
+		</g>
+		{collars.map(([x, y]) => <rect class="collar" x={x - 21} y={y} width="42" height="12" rx="3" />)}
+	</svg>
+
+	<div class="wrap">
+		<div class="copy">
+			<h1>{t('hero.title')}</h1>
+			<p class="lead">{t('hero.lead')}</p>
+			<div class="actions">
+				<a class="btn btn--call" href={`tel:${PHONE}`}>
+					<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+						<path
+							fill="currentColor"
+							d="M6.62 10.79a15.05 15.05 0 0 0 6.59 6.59l2.2-2.2a1 1 0 0 1 1.02-.24c1.12.37 2.33.57 3.57.57a1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.45.57 3.57a1 1 0 0 1-.25 1.02l-2.2 2.2z"
+						></path>
+					</svg>
+					<span>{t('hero.cta.call')}</span>
+					<bdi dir="ltr">{PHONE}</bdi>
+				</a>
+				<a class="btn btn--ghost" href={whatsappURL} target="_blank" rel="noopener">
+					{t('hero.cta.whatsapp')}
+				</a>
+			</div>
+			<ul class="badges">
+				{items('hero.badges').map((key) => <li>{t(key)}</li>)}
+			</ul>
+		</div>
+	</div>
+	<div class="feed" aria-hidden="true"></div>
+</section>
+
+<style>
+	.hero {
+		position: relative;
+		overflow: hidden;
+		background: var(--ink);
+		color: var(--on-ink);
+	}
+	.wrap {
+		padding-block: clamp(3.5rem, 9vw, 7.5rem) clamp(4.5rem, 10vw, 8.5rem);
+	}
+	.copy {
+		max-width: min(40rem, 58%);
+	}
+	h1 {
+		margin: 0;
+		font-family: var(--font-display);
+		font-size: clamp(1.5rem, 6vw, 3rem);
+		font-weight: 800;
+		line-height: 1.35;
+		color: #fff;
+	}
+	.lead {
+		margin: 1.5rem 0 0;
+		max-width: 34rem;
+		font-size: clamp(1.125rem, 1.8vw, 1.3rem);
+	}
+	.actions {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.75rem;
+		margin-block-start: 2.25rem;
+	}
+	.badges {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.5rem 1.75rem;
+		margin: 2rem 0 0;
+		padding: 0;
+		list-style: none;
+		font-size: 1rem;
+	}
+	.badges li {
+		display: flex;
+		align-items: center;
+		gap: 0.55rem;
+	}
+	.badges li::before {
+		content: '';
+		flex: none;
+		width: 8px;
+		height: 8px;
+		border-radius: 50%;
+		background: var(--signal);
+	}
+
+	/* رسمة المواسير: المياه بتملاها مرة واحدة عند فتح الصفحة */
+	.art {
+		position: absolute;
+		inset-block: 0;
+		inset-inline-end: max(1rem, calc((100cqw - var(--wrap)) / 2));
+		width: min(38%, 480px);
+		height: 100%;
+		overflow: visible;
+	}
+	.shell {
+		stroke: var(--pvc);
+		stroke-width: 30;
+	}
+	.flow {
+		stroke: var(--accent-bright);
+		stroke-width: 18;
+		stroke-dasharray: 1;
+		animation: fill-pipe 1.8s cubic-bezier(0.3, 0.1, 0.3, 1) calc(var(--i) * 0.2s) backwards;
+	}
+	.collar {
+		fill: var(--pvc-dark);
+	}
+	@keyframes fill-pipe {
+		from {
+			stroke-dashoffset: 1;
+		}
+		to {
+			stroke-dashoffset: 0;
+		}
+	}
+
+	/* الماسورة الأفقية اللي بتغذي الماسورة الرئيسية */
+	.feed {
+		position: absolute;
+		inset-block-end: 0;
+		inset-inline: var(--pipe-x) 0;
+		z-index: 1;
+		height: var(--pipe-w);
+		box-sizing: border-box;
+		border-block: 3px solid var(--pvc);
+		border-inline-start: 3px solid var(--pvc);
+		border-start-start-radius: var(--pipe-w);
+		background: var(--accent-bright);
+	}
+
+	@media (max-width: 900px) {
+		.art {
+			display: none;
+		}
+		.copy {
+			max-width: none;
+		}
+	}
+	@media (max-width: 480px) {
+		.actions .btn {
+			width: 100%;
+		}
+	}
+	@media (prefers-reduced-motion: reduce) {
+		.flow {
+			animation: none;
+		}
+	}
+</style>

@@ -1,0 +1,74 @@
+---
+import { items, t } from '../../i18n/ar';
+import SectionHead from './SectionHead.astro';
+---
+
+<section id="faq" class="sec">
+	<div class="wrap grid">
+		<SectionHead name="faq" />
+		<div class="list">
+			{
+				items('faq.items').map((key) => (
+					<details>
+						<summary>{t(`${key}.question`)}</summary>
+						<p>{t(`${key}.answer`)}</p>
+					</details>
+				))
+			}
+		</div>
+	</div>
+</section>
+
+<style>
+	.grid {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr) minmax(0, 1.7fr);
+		gap: 0 clamp(2rem, 6vw, 5rem);
+		align-items: start;
+	}
+	.list {
+		border-block-start: 2px solid var(--ink);
+	}
+	details {
+		border-block-end: 1px solid var(--line);
+	}
+	summary {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 1rem;
+		min-height: 48px;
+		padding-block: 1.1rem;
+		font-family: var(--font-display);
+		font-size: 1.125rem;
+		font-weight: 600;
+		line-height: 1.5;
+		color: var(--ink);
+		cursor: pointer;
+		list-style: none;
+	}
+	summary::-webkit-details-marker {
+		display: none;
+	}
+	summary::after {
+		content: '+';
+		flex: none;
+		font-size: 1.6rem;
+		font-weight: 400;
+		line-height: 1;
+		color: var(--accent-strong);
+	}
+	details[open] summary::after {
+		content: '−';
+	}
+	details p {
+		margin: 0;
+		padding-block-end: 1.25rem;
+		color: var(--muted);
+	}
+	@media (max-width: 900px) {
+		.grid {
+			grid-template-columns: 1fr;
+		}
+	}
+</style>

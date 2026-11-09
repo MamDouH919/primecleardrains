@@ -1,0 +1,78 @@
+---
+import { getCollection } from 'astro:content';
+import { t } from '../../i18n/ar';
+import FormattedDate from '../FormattedDate.astro';
+import SectionHead from './SectionHead.astro';
+
+const posts = (await getCollection('blog'))
+	.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
+	.slice(0, 3);
+---
+
+<section id="latest-posts" class="sec sec--tint">
+	<div class="wrap">
+		<SectionHead name="blog" />
+		<ul>
+			{
+				posts.map((post) => (
+					<li>
+						<a href={`/blog/${post.id}/`}>
+							<h3>{post.data.title}</h3>
+							<p>{post.data.description}</p>
+							<small>
+								<FormattedDate date={post.data.pubDate} />
+							</small>
+						</a>
+					</li>
+				))
+			}
+		</ul>
+		<a class="all" href="/blog/">{t('blog.all')}</a>
+	</div>
+</section>
+
+<style>
+	ul {
+		display: grid;
+		grid-template-columns: repeat(3, 1fr);
+		gap: 2rem clamp(1.5rem, 4vw, 3rem);
+		margin: 0 0 2rem;
+		padding: 0;
+		list-style: none;
+	}
+	li a {
+		display: block;
+		padding-block-start: 0.9rem;
+		border-block-start: 2px solid var(--ink);
+		color: inherit;
+		text-decoration: none;
+	}
+	li a:hover h3 {
+		color: var(--accent-strong);
+		text-decoration: underline;
+	}
+	h3 {
+		margin: 0;
+		font-family: var(--font-display);
+		font-size: 1.2rem;
+		font-weight: 600;
+		line-height: 1.45;
+		color: var(--ink);
+	}
+	p {
+		margin: 0.4rem 0;
+		color: var(--muted);
+	}
+	small {
+		color: var(--muted);
+	}
+	.all {
+		font-weight: 600;
+		color: var(--accent-strong);
+	}
+	@media (max-width: 800px) {
+		ul {
+			grid-template-columns: 1fr;
+		}
+	}
+</style>
