@@ -10,7 +10,7 @@ import SectionHead from './SectionHead.astro';
 			{
 				items('why.items').map((key) => (
 					<li>
-						<h3>{t(`${key}.title`)}</h3>
+						<p class="item-title">{t(`${key}.title`)}</p>
 						<p>{t(`${key}.description`)}</p>
 					</li>
 				))
@@ -28,7 +28,8 @@ import SectionHead from './SectionHead.astro';
 		padding: 0;
 		list-style: none;
 	}
-	h3 {
+	/* عنوان الكارت نص عادي مش heading: عشان عدد العناوين في الصفحة يفضل معقول */
+	.item-title {
 		margin: 0;
 		padding-block-start: 0.9rem;
 		border-block-start: 3px solid var(--accent-strong);

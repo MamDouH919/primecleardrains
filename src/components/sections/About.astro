@@ -9,6 +9,9 @@ const images = import.meta.glob<{ default: ImageMetadata }>('/src/assets/home/ab
 	eager: true,
 });
 const photo = Object.values(images)[0]?.default;
+
+// عناوين الفقرات دي مجرد labels، فبتظهر نص عادي مش H3 عشان ما تكترش العناوين في الصفحة
+const labelSections = new Set(['about.sections.3']);
 ---
 
 <section id="about" class="sec sec--tint">
@@ -19,15 +22,19 @@ const photo = Object.values(images)[0]?.default;
 				{
 					items('about.sections').map((key) => (
 						<>
-							<h3>{t(`${key}.title`)}</h3>
-							<p>{t(`${key}.body`)}</p>
+							{labelSections.has(key) ? (
+								<p class="label">{t(`${key}.title`)}</p>
+							) : (
+								<h3>{t(`${key}.title`)}</h3>
+							)}
+							<p class="body">{t(`${key}.body`)}</p>
 						</>
 					))
 				}
 			</div>
 			<aside>
 				{photo && <Image src={photo} alt={t('about.image.alt')} widths={[400, 800]} sizes="(max-width: 900px) 100vw, 400px" />}
-				<h3>{t('about.points.title')}</h3>
+				<p class="label">{t('about.points.title')}</p>
 				<ul>
 					{
 						items('about.points')
@@ -50,7 +57,8 @@ const photo = Object.values(images)[0]?.default;
 	.text {
 		max-width: 42rem;
 	}
-	h3 {
+	h3,
+	.label {
 		margin: 0;
 		font-family: var(--font-display);
 		font-size: 1.3rem;
@@ -58,10 +66,10 @@ const photo = Object.values(images)[0]?.default;
 		line-height: 1.4;
 		color: var(--ink);
 	}
-	.text p {
+	.text .body {
 		margin: 0.6rem 0 2rem;
 	}
-	.text p:last-child {
+	.text .body:last-child {
 		margin-block-end: 0;
 	}
 	aside {

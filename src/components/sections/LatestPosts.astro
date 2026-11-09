@@ -16,13 +16,13 @@ const posts = (await getCollection('blog'))
 			{
 				posts.map((post) => (
 					<li>
-						<a href={`/blog/${post.id}/`}>
-							<h3>{post.data.title}</h3>
-							<p>{post.data.description}</p>
-							<small>
-								<FormattedDate date={post.data.pubDate} />
-							</small>
-						</a>
+						<h3>
+							<a href={`/blog/${post.id}/`}>{post.data.title}</a>
+						</h3>
+						<p>{post.data.description}</p>
+						<small>
+							<FormattedDate date={post.data.pubDate} />
+						</small>
 					</li>
 				))
 			}
@@ -40,16 +40,31 @@ const posts = (await getCollection('blog'))
 		padding: 0;
 		list-style: none;
 	}
-	li a {
-		display: block;
+	/* اللينك على العنوان بس (anchor text قصير)، والكارت كله بيضغط بالـ ::after */
+	li {
+		position: relative;
 		padding-block-start: 0.9rem;
 		border-block-start: 2px solid var(--ink);
+	}
+	h3 a {
 		color: inherit;
 		text-decoration: none;
 	}
-	li a:hover h3 {
+	h3 a::after {
+		content: '';
+		position: absolute;
+		inset: 0;
+	}
+	li:hover h3 {
 		color: var(--accent-strong);
 		text-decoration: underline;
+	}
+	li:has(:focus-visible) {
+		outline: 3px solid var(--accent-strong);
+		outline-offset: 4px;
+	}
+	h3 a:focus-visible {
+		outline: none;
 	}
 	h3 {
 		margin: 0;

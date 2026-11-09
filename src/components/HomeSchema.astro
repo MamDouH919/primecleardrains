@@ -1,10 +1,14 @@
 ---
 // Structured data للصفحة الرئيسية. بياخد الـ keys المتعبية بس،
 // عشان أسماء الـ keys ما تظهرش لجوجل.
+import logo from '../assets/logo.webp';
+import photo from '../assets/home/about.webp';
 import { PHONE } from '../consts';
 import { filled, items } from '../i18n/ar';
 
 const siteUrl = new URL('/', Astro.site).href;
+const logoUrl = new URL(logo.src, Astro.site).href;
+const imageUrl = new URL(photo.src, Astro.site).href;
 
 const faqEntries = items('faq.items').flatMap((key) => {
 	const question = filled(`${key}.question`);
@@ -41,12 +45,15 @@ const graph: Record<string, unknown>[] = [
 		name: filled('site.name'),
 		description: filled('site.description'),
 		telephone: PHONE,
+		logo: { '@type': 'ImageObject', url: logoUrl, width: logo.width, height: logo.height },
+		image: imageUrl,
 		address: {
 			'@type': 'PostalAddress',
 			streetAddress: filled('footer.address'),
 			addressCountry: 'KW',
 		},
 		areaServed: areas.length > 0 ? areas : { '@type': 'Country', name: 'Kuwait' },
+		openingHours: 'Mo-Su 00:00-23:59',
 		openingHoursSpecification: {
 			'@type': 'OpeningHoursSpecification',
 			dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],

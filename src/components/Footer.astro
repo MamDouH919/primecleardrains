@@ -13,7 +13,7 @@ const whatsappURL = `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(WHATSAP
 			<p>{t('footer.about')}</p>
 		</div>
 		<div>
-			<h2>{t('footer.services.title')}</h2>
+			<p class="col-title">{t('footer.services.title')}</p>
 			<ul>
 				{
 					items('services.items').map((key) => (
@@ -25,7 +25,7 @@ const whatsappURL = `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(WHATSAP
 			</ul>
 		</div>
 		<div>
-			<h2>{t('footer.areas.title')}</h2>
+			<p class="col-title">{t('footer.areas.title')}</p>
 			<ul>
 				{
 					items('areas.items')
@@ -39,7 +39,7 @@ const whatsappURL = `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(WHATSAP
 			</ul>
 		</div>
 		<address>
-			<h2>{t('footer.contact.title')}</h2>
+			<p class="col-title">{t('footer.contact.title')}</p>
 			<dl>
 				<dt>{t('footer.phone.label')}</dt>
 				<dd><a href={`tel:${PHONE}`} dir="ltr">{PHONE}</a></dd>
@@ -80,7 +80,8 @@ const whatsappURL = `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(WHATSAP
 	.about p:last-child {
 		margin: 0;
 	}
-	h2 {
+	/* عناوين الأعمدة مش headings عشان ما تتكررش مع عناوين أقسام الصفحة */
+	.col-title {
 		margin: 0 0 0.75rem;
 		font-family: var(--font-display);
 		font-size: 1.05rem;
